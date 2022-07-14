@@ -1,2 +1,16 @@
 [dependencies]
 base = "0.7.4"
+[dependencies]
+base = "https://github.com/dfinity/motoko-base#moc-0.7.2"
+MultiValuedMap = "https://github.com/NatLabs/MultiValuedMap#main"
+Itertools = "https://github.com/NatLabs/Itertools.mo#main"
+serde = "https://github.com/NatLabs/serde#main"
+http = "https://github.com/aviate-labs/http.mo#v0.1.1"
+json = "https://github.com/aviate-labs/json.mo#v0.2.0"
+moh = "https://github.com/NatLabs/moh#main"
+
+[package]
+name = "web-api"
+version = "0.1.0"
+description = ""
+repository = ""

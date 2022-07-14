@@ -1,9 +1,20 @@
+<<<<<<< HEAD
+=======
+Filename: `[Section]/[Function].Test.mo`
+
+>>>>>>> ce6a4b5 (template)
 ```motoko
 import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
 
+<<<<<<< HEAD
 import ActorSpec "./utils/ActorSpec";
 import Lib "../src";
+=======
+import ActorSpec "../utils/ActorSpec";
+import Algo "../../src";
+// import [FnName] "../../src/[section]/[FnName]";
+>>>>>>> ce6a4b5 (template)
 
 let {
     assertTrue; assertFalse; assertAllTrue; 
@@ -13,10 +24,15 @@ let {
 let success = run([
     describe(" (Function Name) ", [
         it("(test name)", do {
+<<<<<<< HEAD
             // assertTrue(Lib.fnCall() == expectedResult)
             // assertAllTrue([Lib.fnCall() == expectedResult, Lib.fn2() == res2])
 
            assertTrue(true)
+=======
+            
+            // ...
+>>>>>>> ce6a4b5 (template)
         }),
     ])
 ]);
