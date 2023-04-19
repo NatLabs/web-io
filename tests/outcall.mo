@@ -1,10 +1,11 @@
 import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
+import Text "mo:base/Text";
 
 import ActorSpec "./utils/ActorSpec";
 
-import Lib "../src/";
+import File "../src/outcall";
 
 let {
     assertTrue;
@@ -19,12 +20,17 @@ let {
 
 let success = run([
     describe(
-        " (Function Name) ",
+        "File",
         [
             it(
-                "(test name)",
+                "append blob",
                 do {
-                    assertTrue(true);
+
+                    outcall.fetch()
+
+                    assertTrue(
+                        file.blob() == file.slice(0, 11),
+                    );
                 },
             ),
         ],

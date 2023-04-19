@@ -2,7 +2,6 @@ import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 
 import Request "../Request";
-import Response "../Response";
 import ResponseBuilder "../Router/ResponseBuilder";
 
 import T "Types";
@@ -44,7 +43,7 @@ module {
 
         let httpRes : T.CanisterHttpResponse = await ic.http_request(args);
 
-        let res = Response.Response();
+        let res = ResponseBuilder.ResponseBuilder();
         res.status := httpRes.status_code;
         res.setBody(Blob.fromArray(httpRes.body));
 

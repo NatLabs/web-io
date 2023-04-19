@@ -6,7 +6,6 @@ import Blob "mo:base/Blob";
 import Http "mo:http/Http";
 import JSON "mo:serde/JSON";
 
-import Response "../Response";
 import Types "Types";
 
 module {
@@ -37,7 +36,7 @@ module {
         func functor() : ResponseBuilder {
             object {
                 public func status(n : Nat16) : ResponseBuilder {
-                    res.status_code := n;
+                    res.status := n;
                     functor();
                 };
 
@@ -62,18 +61,18 @@ module {
                 public func json(blob : Blob, recordKeys : [Text]) : ResponseBuilder {
                     res.headers.put("Content-Type", "application/json");
                     let jsonText = JSON.toText(blob, recordKeys);
-                    res.body := Text.encodeUtf8(jsonText);
+                    res.body.setBlob(Text.encodeUtf8(jsonText));
 
                     functor();
                 };
 
                 public func text(t : Text) : ResponseBuilder {
-                    res.body := Text.encodeUtf8(t);
+                    res.body.setBlob(Text.encodeUtf8(t));
                     functor();
                 };
 
                 public func body(b : Blob) : ResponseBuilder {
-                    res.body := b;
+                    res.body.setBlob(b);
                     functor();
                 };
 
@@ -84,8 +83,8 @@ module {
 
                 public func build() : HttpResponse {
                     {
-                        status_code = res.status_code;
-                        body = res.body;
+                        status_code = res.status;
+                        body = res.body.blob();
                         headers = Iter.toArray(res.headers.entries());
                         update = if (res.update) { ?true } else { null };
                         streaming_strategy = res.streaming_strategy;

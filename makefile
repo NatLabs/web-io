@@ -2,7 +2,7 @@
 
 # runs all tests using the moc interpreter (not all features in motoko are supported)
 test: 
-	$(shell vessel bin)/moc -r $(shell mops sources) -wasi-system-api ./tests/*.Test.mo
+	find tests -type f -name '*.Test.mo' -print0 | xargs -0 $(shell vessel bin)/moc -r $(shell mops sources) -wasi-system-api
 
 # compile all tests or selected test file by passing `file=filename`
 compile-tests: 

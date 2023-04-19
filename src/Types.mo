@@ -31,7 +31,7 @@ module {
         status_code : Nat16;
         body : Blob;
         headers : [HeaderField];
-        update : Bool;
+        update : ?Bool;
         streaming_strategy : ?StreamingStrategy;
     };
 
@@ -110,4 +110,6 @@ module {
         headers : Headers;
         body : ?Body;
     };
+
+    public type SharedMessage = { caller : Principal };
 };

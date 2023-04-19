@@ -7,8 +7,10 @@
 
 import Iter "mo:base/Iter";
 import Text "mo:base/Text";
+import TrieMap "mo:base/TrieMap";
 
 import MultiValuedMap "mo:MultiValuedMap";
+import Mo "mo:moh";
 
 import T "Types";
 
@@ -21,20 +23,20 @@ module {
         /// Associates a single value with the key and overwrites and previous values
         public func put(key : Text, value : Text) {
             let headerKey = formatKey(key);
-            map.put(key, headerKey);
+            map.put(headerKey, value);
         };
 
         /// Appends a value to the values associated with the given field
         public func add(key : Text, value : Text) {
             let headerKey = formatKey(key);
-            map.add(key, headerKey);
+            map.add(headerKey, value);
         };
 
         /// Removes all the values associated with the given key
-        public func remove(key : Text) : [Text] {
-            let headerKey = formatKey(key);
-            map.remove(headerKey);
-        };
+        // public func remove(key : Text) : [Text] {
+        //     let headerKey = formatKey(key);
+        //     map.remove(headerKey);
+        // };
 
         /// Retrieves the first value in the header field
         public func get(key : Text) : ?Text {
@@ -77,12 +79,17 @@ module {
     ///
     /// Returns the original text is it contains a space or any invalid characters
     public func formatKey(field_key : Text) : Text {
-        if (Text.contains(field_key, #char ' ')) {
-            return field_key;
-        };
+        let dashed = Text.replace(field_key, #char ' ', "-");
+        let words = Text.split(dashed, #char '-');
 
-        // capitalizeWords(field_key, #char '-');
-        field_key;
+        let capitalized = Iter.map<Text, Text>(
+            words,
+            func(word : Text) : Text {
+                Mo.Text.capitalize(word);
+            },
+        );
+
+        Text.join("-", capitalized);
     };
 
     /// Create a `Headers` instance by calling this constructor and passing an array of key-value tuple pairs

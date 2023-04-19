@@ -1,5 +1,5 @@
-module{
-     public type HttpHeader = {
+module {
+    public type HttpHeader = {
         name : Text;
         value : Text;
     };
@@ -38,4 +38,4 @@ module{
     public type IC = actor {
         http_request : CanisterHttpRequest -> async CanisterHttpResponse;
     };
-}
+};

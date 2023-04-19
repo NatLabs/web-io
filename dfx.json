@@ -1,6 +1,12 @@
 {
     "version": 1,
-    "dfx": "0.12.1",
+    "dfx": "0.13.1",
+    "canisters": {
+        "example_form": {
+          "type": "motoko",
+          "main": "example/form/src/main.mo"
+        }
+      },
     "defaults": {
         "build": {
             "packtool": "mops sources",

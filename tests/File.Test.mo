@@ -3,9 +3,9 @@ import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 
-import ActorSpec "../utils/ActorSpec";
+import ActorSpec "./utils/ActorSpec";
 
-import File "../../src/File";
+import File "../src/File";
 
 let {
     assertTrue;

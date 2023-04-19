@@ -33,8 +33,8 @@
         "/users/:username",
         func(
             req : Router.Request,
-            res : Router.ResponseBuilder,
-        ) : async Router.HttpResponse {
+            res : Router.Response,
+        ) {
             let username = switch (req.params.get("username")) {
                 case (?username) username;
                 case (null) "anon";
@@ -48,8 +48,8 @@
         "/users/signup",
         func(
             req : Router.Request,
-            res : Router.ResponseBuilder,
-        ) : async Router.HttpResponse {
+            res : Router.Response,
+        ) : async () {
             
             type Credentials = {
                 username : Text;
@@ -73,10 +73,13 @@
     );
 
     public query func http_request(httpReq: Router.HttpRequest) : async Router.HttpResponse {
-        await router.processRequest(httpReq);
+        router.processRequest(httpReq);
     };
 
     public func http_request_update(httpReq: Router.HttpRequest) : async Router.HttpResponse {
         await router.processUpdateRequest(httpReq);
     };
 ```
+
+## References
+- [Content Disposition RFC](https://www.ietf.org/rfc/rfc2183.txt)

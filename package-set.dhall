@@ -21,7 +21,7 @@ let packages = [
 		dependencies = [ "base" ] : List Text
 	},
 	{ 
-		name = "Itertools", 
+		name = "itertools", 
 		version = "main", 
 		repo = "https://github.com/NatLabs/Itertools.mo", 
 		dependencies = [ "base" ] : List Text
