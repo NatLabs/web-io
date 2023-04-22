@@ -1,26 +1,31 @@
 /// This Headers class represents the key-value pairs in an HTTP header.
+///
 /// The keys should be in canonical form as defined by the HTTP standard.
 ///
 /// The format is says the first character should be uppercase and all
 /// the first characters after a hyphen, '-', should also be uppercase.
 /// (eg. "Content-Type")
 
+import Array "mo:base/Array";
+import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
 import Text "mo:base/Text";
 import TrieMap "mo:base/TrieMap";
 
-import MultiValuedMap "mo:MultiValuedMap";
 import Mo "mo:moh";
 
+import ArrayMap "ArrayMap";
 import T "Types";
 
 module {
     type HeaderField = T.HeaderField;
 
     public class Headers() {
-        let map = MultiValuedMap.MultiValuedMap<Text, Text>(Text.equal, Text.hash);
+        let map = ArrayMap.ArrayMap<Text, Text>(Text.equal, Text.hash);
 
-        /// Associates a single value with the key and overwrites and previous values
+        public func size() : Nat = map.size();
+
+        /// Ensures that there is only one value associated with the key
         public func put(key : Text, value : Text) {
             let headerKey = formatKey(key);
             map.put(headerKey, value);
@@ -33,19 +38,24 @@ module {
         };
 
         /// Removes all the values associated with the given key
-        // public func remove(key : Text) : [Text] {
-        //     let headerKey = formatKey(key);
-        //     map.remove(headerKey);
-        // };
+        public func remove(key : Text) : ?[Text] {
+            let headerKey = formatKey(key);
+            map.remove(headerKey);
+        };
 
-        /// Retrieves the first value in the header field
+        public func contains(key : Text) : Bool {
+            let headerKey = formatKey(key);
+            map.contains(key);
+        };
+
+        /// Retrieves the most recent value associated with the header field
         public func get(key : Text) : ?Text {
             let headerKey = formatKey(key);
-            map.getFirst(headerKey);
+            map.getBack(headerKey);
         };
 
         /// Retrieves all the values associated with the header field
-        public func getAll(key : Text) : [Text] {
+        public func getAll(key : Text) : ?[Text] {
             let headerKey = formatKey(key);
             map.get(headerKey);
         };
@@ -101,5 +111,16 @@ module {
         };
 
         header;
+    };
+
+    public func toArray(headers : Headers) : [HeaderField] {
+        let entries = headers.entries();
+        Array.tabulate(
+            headers.size(),
+            func(_ : Nat) : HeaderField = switch (entries.next()) {
+                case (?entry) { entry };
+                case null { Debug.trap("Headers.toArray: unexpected null") };
+            },
+        );
     };
 };

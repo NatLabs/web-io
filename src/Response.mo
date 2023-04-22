@@ -3,7 +3,9 @@ import Iter "mo:base/Iter";
 import Text "mo:base/Text";
 import Option "mo:base/Option";
 import Blob "mo:base/Blob";
+import Debug "mo:base/Debug";
 import Buffer "mo:base/Buffer";
+import Nat16 "mo:base/Nat16";
 
 import serde_json "mo:serde/JSON";
 
@@ -26,24 +28,64 @@ module {
 
         var _body = __body;
 
-        public let body = {
-            // getter fns for converting body to different types
-            blob = func() : Blob = _body;
-            text = func() : ?Text = Text.decodeUtf8(_body);
-            json = func() : ?Blob {
-                Option.map(body.text(), serde_json.fromText);
-            };
-            bytes = func() : [Nat8] = Blob.toArray(_body);
-            buffer = func() : Buffer.Buffer<Nat8> = Buffer.fromArray(body.bytes());
-            size = func() : Nat = _body.size();
+        public func blob() : Blob = _body;
+        public func text() : ?Text = Text.decodeUtf8(_body);
+        public func strict_text() : Text = switch (Text.decodeUtf8(_body)) {
+            case (?t) { t };
+            case (null) { Debug.trap("Failed to decode response body as text") };
         };
+
+        public func json() : ?Blob {
+            Option.map(text(), serde_json.fromText);
+        };
+        public func strict_json() : Blob {
+            switch (Option.map(text(), serde_json.fromText)) {
+                case (?b) { b };
+                case (null) { Debug.trap("Failed to decode response body as JSON") };
+            };
+        };
+        public func bytes() : [Nat8] = Blob.toArray(_body);
+        public func buffer() : Buffer.Buffer<Nat8> = Buffer.fromArray(bytes());
+        public func size() : Nat = _body.size();
+    };
+
+    public func fromCanisterHttp(res : T.CanisterHttpResponse) : Response {
+        let headers = Headers.Headers();
+
+        for (header in res.headers.vals()) {
+            headers.add(header.name, header.value);
+        };
+
+        let options = {
+            update = false;
+            streaming_strategy = null;
+            headers = ?headers;
+        };
+
+        Response(Nat16.fromNat(res.status), Blob.fromArray(res.body), ?options);
+    };
+
+    public func fromHttpResponse(res : T.HttpResponse) : Response {
+        let headers = Headers.Headers();
+
+        for ((key, val) in res.headers.vals()) {
+            headers.add(key, val);
+        };
+
+        let options = {
+            update = if (res.update == ?true) true else false;
+            streaming_strategy = res.streaming_strategy;
+            headers = ?headers;
+        };
+
+        Response(res.status_code, res.body, ?options);
     };
 
     public func toHttpResponse(res : Response) : T.HttpResponse {
         {
             status_code = res.status_code;
             headers = Iter.toArray(res.headers.entries());
-            body = res.body.blob();
+            body = res.blob();
             update = ?res.update;
             streaming_strategy = res.streaming_strategy;
         };

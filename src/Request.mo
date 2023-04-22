@@ -7,13 +7,12 @@ import Principal "mo:base/Principal";
 import TrieMap "mo:base/TrieMap";
 
 import serde_json "mo:serde/JSON";
-import Itertools "mo:itertools/Iter";
 import { Method } "mo:http/Http";
 
 import Form "Form";
 import Headers "Headers";
 import URL "URL";
-import UrlEncodedValues "UrlEncodedValues";
+import UrlEncoding "UrlEncoding";
 import T "Types";
 
 module {
@@ -35,54 +34,43 @@ module {
         /// The caller of the request, if available. If the caller is not available, the **anonymous** principal is used.
         public let caller = Option.get(do ? { options!.shared_msg!.caller }, Principal.fromText("2vxsx-fae"));
 
+        /// The path parameters extrancted from the url.
+        /// The path parameters are the parts of the url that are prefixed with a colon when setting a route in the Router.
+        /// For example, in the url `/users/:id`, the path parameter is `id`.
         public let params = TrieMap.TrieMap<Text, Text>(Text.equal, Text.hash);
-        public let query_params = UrlEncodedValues.fromText(url.query_text);
 
-        public let body = {
-            blob = func() : Blob = _body;
-            text = func() : ?Text = Text.decodeUtf8(_body);
-            strict_text = func() : Text {
-                switch (Text.decodeUtf8(_body)) {
-                    case (?text) { text };
-                    case (null) { Debug.trap("Could not decode body as text") };
-                };
+        /// Reference to the query parameter map in the URL object.
+        public let query_map = url.query_map;
+
+        // body helper functions
+        public func blob() : Blob = _body;
+        public func text() : ?Text = Text.decodeUtf8(_body);
+        public func strict_text() : Text = switch (Text.decodeUtf8(_body)) {
+            case (?text) { text };
+            case (null) { Debug.trap("Could not decode body as text") };
+        };
+        public func json() : ?Blob = Option.map(text(), serde_json.fromText);
+        public func strict_json() : Blob = switch (text()) {
+            case (?text) { serde_json.fromText(text) };
+            case (null) { Debug.trap("Could not decode body as text") };
+        };
+
+        var cached_form : ?Form.Form = null;
+
+        public func form() : Form.Form {
+            switch (cached_form) {
+                case (?cached_form) return cached_form;
+                case (null) {};
             };
 
-            json = func() : ?Blob {
-                let optText = Text.decodeUtf8(_body);
-                Option.map(optText, serde_json.fromText);
-            };
-
-            strict_json = func() : Blob {
-                let text = Text.decodeUtf8(_body);
-                switch (text) {
-                    case (?text) { serde_json.fromText(text) };
-                    case (null) { Debug.trap("Could not decode body as text") };
-                };
+            let parsed_form = switch(Form.parse_with_headers(_body, headers)) {
+                case (?form)  form;
+                case (null) Form.Form();
             };
             
-            setBlob = func(body : Blob) {
-                _body := body;
-            };
-            setText = func(text : Text) {
-                _body := Text.encodeUtf8(text);
-            };
-            setJson = func(jsonText : Text) {
-                let jsonBlob = serde_json.fromText(jsonText);
-                _body := jsonBlob;
-            };
+            cached_form := ?parsed_form;
+            parsed_form;
         };
-
-        let boundary = do ? {
-            let content_type = headers.get("content-type")!;
-            let iter = Text.split(content_type, #text(";"));
-            let second = Itertools.nth(iter, 1)!;
-            let boundary = Text.split(second, #text("="));
-            Itertools.nth(boundary, 1)!;
-        };
-
-        public let { files; values = form_values } = Form.parse(body.strict_text(), boundary);
-
     };
 
     public func fromHttpRequest(httpReq : T.HttpRequest) : Request {

@@ -13,17 +13,22 @@ module {
         headers : [HeaderField];
     };
 
-    public type StreamingCallbackToken = {
+    public type StreamingToken = {
         key : Text;
-        sha256 : ?Blob;
         index : Nat;
-        content_encoding : Text;
     };
+
+    public type StreamingResponse = {
+        token : ?StreamingToken;
+        body : Blob;
+    };
+
+    public type StreamingCallback = shared query (StreamingToken) -> async StreamingResponse;
 
     public type StreamingStrategy = {
         #Callback : {
-            token : StreamingCallbackToken;
-            callback : shared () -> async ();
+            token : StreamingToken;
+            callback : StreamingCallback;
         };
     };
 
@@ -112,4 +117,55 @@ module {
     };
 
     public type SharedMessage = { caller : Principal };
+
+    /// Canister HTTP outcall request and response types
+    public type HttpHeader = {
+        name : Text;
+        value : Text;
+    };
+
+    public type HttpMethod = {
+        #get;
+        #post;
+        #head;
+    };
+
+    public type TransformContext = {
+        function : shared query TransformArgs -> async CanisterHttpResponse;
+        context : Blob;
+    };
+
+    public type CanisterHttpRequest = {
+        url : Text;
+        max_response_bytes : ?Nat64;
+        headers : [HttpHeader];
+        body : ?[Nat8];
+        method : HttpMethod;
+        transform : ?TransformContext;
+    };
+
+    public type CanisterHttpResponse = {
+        status : Nat;
+        headers : [HttpHeader];
+        body : [Nat8];
+        
+    };
+
+    public type RedirectedResponse = {
+        url : Text;
+        response : CanisterHttpResponse;
+    };
+
+    public type OutcallResponse = CanisterHttpResponse and {
+        redirects : [RedirectedResponse];
+    };
+
+    public type TransformArgs = {
+        response : CanisterHttpResponse;
+        context : Blob;
+    };
+
+    public type ManagementCanister = actor {
+        http_request : CanisterHttpRequest -> async CanisterHttpResponse;
+    };
 };

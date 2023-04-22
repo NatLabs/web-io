@@ -1,5 +1,4 @@
-/// The File class holds the data of a single file. The File class provides the minimum interface required for a file. Additional functions are added to the module for manipulating chunked data.
-
+/// Module for representing files
 import Array "mo:base/Array";
 import Blob "mo:base/Blob";
 import Buffer "mo:base/Buffer";
@@ -18,29 +17,29 @@ module {
     /// Required arguements for initializing a `File`
     public type FileData = {
         filename : Text;
-        mimeType : Text;
-        lastModified : ?Time.Time;
+        content_type : Text;
+        mtime : ?Time.Time;
     };
 
+    /// The File class holds the data and metadata of a single file. 
+    /// The File class provides the minimum interface required for a file. 
+    /// Additional functions are added to the module for manipulating chunked data.
     public class File(
         _filename : Text,
-        _mimeType : Text,
-        _lastModified : ?Time.Time,
+        _content_type : Text,
+        _mtime : ?Time.Time,
     ) {
 
         /// The name and extention of the file.
         public let filename = _filename;
 
         /// The MIME type of the file
-        public let mimeType = _mimeType;
+        public let content_type = _content_type;
 
-        /// The UTC timestamp when the file was last modified
-        public let lastModified = switch (_lastModified) {
-            case (?time) time;
-            case (null) Time.now();
-        };
+        /// The UTC timestamp of when the file was last modified
+        public let mtime = _mtime;
 
-        let buffer = Buffer.Buffer<Nat8>(8);
+        public let buffer = Buffer.Buffer<Nat8>(8);
 
         /// The number of bytes of the file
         public func size() : Nat {
@@ -48,7 +47,7 @@ module {
         };
 
         /// Get's the file's data as a Blob
-        public func blob() : Blob {
+        public func content() : Blob {
             Blob.fromArray(Buffer.toArray(buffer));
         };
 
@@ -76,11 +75,24 @@ module {
         };
     };
 
+    /// Creates a file from an byte iterator
+    public func fromBytes(fileData : FileData, bytes : Iter<Nat8>) : File {
+        let { filename; content_type; mtime } = fileData;
+
+        let file = File(filename, content_type, mtime);
+
+        for (byte in bytes) {
+            file.buffer.add(byte);
+        };
+
+        file;
+    };
+
     /// Creates a file from an array of consecutive blob slices of the file's dataa
     public func fromChunks(fileData : FileData, chunks : [Blob]) : File {
-        let { filename; mimeType; lastModified } = fileData;
+        let { filename; content_type; mtime } = fileData;
 
-        let file = File(filename, mimeType, lastModified);
+        let file = File(filename, content_type, mtime);
 
         for (i in Iter.range(0, (chunks.size() - 1) : Nat)) {
             file.append(chunks[i]);
@@ -121,6 +133,6 @@ module {
     ///
     /// It returns `null` if the File is not `utf8` encoded
     public func toText(file : File) : ?Text {
-        Text.decodeUtf8(file.blob());
+        Text.decodeUtf8(file.content());
     };
 };

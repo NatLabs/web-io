@@ -12,15 +12,27 @@ type HttpRequest = { url : Text; method : Text; body : Blob; headers : [HeaderFi
 ```
 
 
-## Type `StreamingCallbackToken`
+## Type `StreamingToken`
 ``` motoko no-repl
-type StreamingCallbackToken = { key : Text; sha256 : ?Blob; index : Nat; content_encoding : Text }
+type StreamingToken = { key : Text; index : Nat }
+```
+
+
+## Type `StreamingResponse`
+``` motoko no-repl
+type StreamingResponse = { token : ?StreamingToken; body : Blob }
+```
+
+
+## Type `StreamingCallback`
+``` motoko no-repl
+type StreamingCallback = shared query (StreamingToken) -> async StreamingResponse
 ```
 
 
 ## Type `StreamingStrategy`
 ``` motoko no-repl
-type StreamingStrategy = {#Callback : { token : StreamingCallbackToken; callback : shared () -> async () }}
+type StreamingStrategy = {#Callback : { token : StreamingToken; callback : StreamingCallback }}
 ```
 
 
@@ -69,5 +81,66 @@ type FormObjType = { get : (Text) -> ?[Text]; trieMap : TrieMap.TrieMap<Text, [T
 ## Type `ParsedHttpRequest`
 ``` motoko no-repl
 type ParsedHttpRequest = { method : Text; url : URL; headers : Headers; body : ?Body }
+```
+
+
+## Type `SharedMessage`
+``` motoko no-repl
+type SharedMessage = { caller : Principal }
+```
+
+
+## Type `HttpHeader`
+``` motoko no-repl
+type HttpHeader = { name : Text; value : Text }
+```
+
+Canister HTTP outcall request and response types
+
+## Type `HttpMethod`
+``` motoko no-repl
+type HttpMethod = {#get; #post; #head}
+```
+
+
+## Type `TransformContext`
+``` motoko no-repl
+type TransformContext = { function : shared query TransformArgs -> async CanisterHttpResponse; context : Blob }
+```
+
+
+## Type `CanisterHttpRequest`
+``` motoko no-repl
+type CanisterHttpRequest = { url : Text; max_response_bytes : ?Nat64; headers : [HttpHeader]; body : ?[Nat8]; method : HttpMethod; transform : ?TransformContext }
+```
+
+
+## Type `CanisterHttpResponse`
+``` motoko no-repl
+type CanisterHttpResponse = { status : Nat; headers : [HttpHeader]; body : [Nat8] }
+```
+
+
+## Type `RedirectedResponse`
+``` motoko no-repl
+type RedirectedResponse = { url : Text; response : CanisterHttpResponse }
+```
+
+
+## Type `OutcallResponse`
+``` motoko no-repl
+type OutcallResponse = CanisterHttpResponse and { redirects : [RedirectedResponse] }
+```
+
+
+## Type `TransformArgs`
+``` motoko no-repl
+type TransformArgs = { response : CanisterHttpResponse; context : Blob }
+```
+
+
+## Type `ManagementCanister`
+``` motoko no-repl
+type ManagementCanister = actor { http_request : shared CanisterHttpRequest -> async CanisterHttpResponse }
 ```
 

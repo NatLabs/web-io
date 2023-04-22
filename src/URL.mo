@@ -7,32 +7,38 @@ import Text "mo:base/Text";
 
 import Mo "mo:moh";
 import Itertools "mo:itertools/Iter";
+import PeekableIter "mo:itertools/PeekableIter";
+
+import UrlEncoding "UrlEncoding";
 
 module {
 
     public class URL(url : Text) {
 
-        public let text = url;
-
         var xs = url;
+        var includes_protocol = false;
 
         public let protocol = if (Text.startsWith(xs, #text("http://"))) {
             xs := Mo.Text.stripStart(xs, #text("http://"));
+            includes_protocol := true;
             "http";
-        } else {
+        } else if (Text.startsWith(xs, #text("https://"))) {
             xs := Mo.Text.stripStart(xs, #text("https://"));
+            includes_protocol := true;
             "https";
+        }else{
+            "https"
         };
 
         var authority = "";
 
         if (not Text.startsWith(xs, #text("/"))) {
-            let chars = xs.chars();
+            let chars = Itertools.peekable(xs.chars());
 
             authority := Text.fromIter(
-                Itertools.takeWhile(chars, func(c : Char) : Bool { c != '/' }),
+                PeekableIter.takeWhile(chars, func(c : Char) : Bool { c != '/' }),
             );
-            xs := "/" # Text.fromIter(chars);
+            xs := Text.fromIter(chars);
         };
 
         let auth = Iter.toArray(Text.split(authority, #char(':')));
@@ -62,7 +68,7 @@ module {
 
         let qs = Iter.toArray(Text.split(xs, #char('?')));
 
-        public let query_text = switch (qs.size()) {
+        let _query_text = switch (qs.size()) {
             case (0) { "" };
             case (1) { "" };
             case (2) { xs := qs[0]; qs[1] };
@@ -72,7 +78,21 @@ module {
             };
         };
 
+        public let query_map = switch(UrlEncoding.fromText(_query_text)){
+            case (?map) map;
+            case (null) Debug.trap("URL parsing error: Invalid query string (" # _query_text # ")");
+        };
+
+        public func query_text() : Text = UrlEncoding.toText(query_map);
+
         public let path = xs;
-        public let segments = Iter.toArray(Text.split(path, #char('/')));
+        public let segments = Iter.toArray(Text.tokens(path, #char('/')));
+
+        let _protocol = if (includes_protocol) { protocol # "://" } else { "" };
+        public let text = _protocol # authority # path;
+    };
+
+    public func toText(url: URL) : Text {
+        url.text # "?" # url.query_text();
     };
 };

@@ -2,9 +2,13 @@
     "version": 1,
     "dfx": "0.13.1",
     "canisters": {
-        "example_form": {
+        "form": {
           "type": "motoko",
-          "main": "example/form/src/main.mo"
+          "main": "example/form/main.mo"
+        },
+        "http_counter" : {
+            "type": "motoko",
+            "main": "example/http_counter.mo"
         }
       },
     "defaults": {
