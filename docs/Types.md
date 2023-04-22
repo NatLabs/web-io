@@ -38,7 +38,7 @@ type StreamingStrategy = {#Callback : { token : StreamingToken; callback : Strea
 
 ## Type `HttpResponse`
 ``` motoko no-repl
-type HttpResponse = { status_code : Nat16; body : Blob; headers : [HeaderField]; update : Bool; streaming_strategy : ?StreamingStrategy }
+type HttpResponse = { status_code : Nat16; body : Blob; headers : [HeaderField]; update : ?Bool; streaming_strategy : ?StreamingStrategy }
 ```
 
 

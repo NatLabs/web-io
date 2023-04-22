@@ -1,7 +1,7 @@
 # Index
 
 * [ArrayMap](ArrayMap.md) 
-* [File](File.md) The File class holds the data of a single file. The File class provides the minimum interface required for a file. Additional functions are added to the module for manipulating chunked data.
+* [File](File.md) Module for representing files
 * [Form/SlowParser](Form/SlowParser.md) 
 * [Headers](Headers.md) This Headers class represents the key-value pairs in an HTTP header.
 * [Request](Request.md) 

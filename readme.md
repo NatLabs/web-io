@@ -1,5 +1,4 @@
-# http tools
- WIP
+# Web API
 
  > This is still a work in progress. The API is not stable and is subject to change.
  
@@ -82,7 +81,7 @@
     };
 
     public func http_request_update(http_res: Router.HttpRequest) : async Router.HttpResponse {
-        router.process_update_request(http_res);
+        router.process_request_update(http_res);
     };
 ```
 

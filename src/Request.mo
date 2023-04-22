@@ -23,6 +23,7 @@ module {
         shared_msg : ?T.SharedMessage;
     };
 
+    /// The Request class represents an HTTP request and provides helpful methods
     public class Request(_method : Text, _url : Text, options : ?RequestOptions) {
         public let url = URL.URL(_url);
         public let method = _method;
@@ -42,14 +43,22 @@ module {
         /// Reference to the query parameter map in the URL object.
         public let query_map = url.query_map;
 
-        // body helper functions
+        /// Returns the request body as a Blob
         public func blob() : Blob = _body;
+
+        /// Returns the request body as a Text
         public func text() : ?Text = Text.decodeUtf8(_body);
+
+        /// Returns the request body as a Text, or traps if the body cannot be decoded as text
         public func strict_text() : Text = switch (Text.decodeUtf8(_body)) {
             case (?text) { text };
             case (null) { Debug.trap("Could not decode body as text") };
         };
+
+        /// Returns the request body as a JSON blob, that can be decoded to primitive motoko types using the `from_candid()` global function
         public func json() : ?Blob = Option.map(text(), serde_json.fromText);
+
+        /// Returns the request body as a JSON blob, or traps if the body cannot be decoded as JSON
         public func strict_json() : Blob = switch (text()) {
             case (?text) { serde_json.fromText(text) };
             case (null) { Debug.trap("Could not decode body as text") };
@@ -57,6 +66,7 @@ module {
 
         var cached_form : ?Form.Form = null;
 
+        /// Returns the request body as a Form object
         public func form() : Form.Form {
             switch (cached_form) {
                 case (?cached_form) return cached_form;
@@ -73,6 +83,7 @@ module {
         };
     };
 
+    /// Create a `Request` object from a `HttpRequest` record
     public func fromHttpRequest(httpReq : T.HttpRequest) : Request {
         let {
             method;
