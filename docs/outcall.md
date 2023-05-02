@@ -24,18 +24,18 @@ let MB
 func get(url : Text) : RequestBuilder
 ```
 
-Create a get request.
+Returns a request builder for a get request.
 
 ## Function `post`
 ``` motoko no-repl
 func post(url : Text) : RequestBuilder
 ```
 
-Create a post request.
+Returns a request builder for a post request.
 
 ## Function `head`
 ``` motoko no-repl
 func head(url : Text) : RequestBuilder
 ```
 
-Create a head request.
+Returns a request builder for a put request.

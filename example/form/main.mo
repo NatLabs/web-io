@@ -57,8 +57,7 @@ actor {
         let res = Response.fromCanisterHttp(raw_res);
 
         let json_blob = res.strict_json();
-        let joke : ?JokeObj = from_candid(json_blob);
-
+        from_candid(json_blob);
     };
 
     public shared query (msg) func http_request(rawReq : Router.HttpRequest) : async  Router.HttpResponse {

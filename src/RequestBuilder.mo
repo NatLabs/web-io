@@ -40,7 +40,7 @@ module {
         var _follow_redirects = false;
         var _max_redirects = 5;
         var _form = Form.Form();
-        var _cycles = 1_000_000_000_000;
+        var _cycles = 1_000_000_000;
 
         let KB : Nat64 = 1024;
         var _max_response_bytes = KB * 10;

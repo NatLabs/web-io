@@ -10,17 +10,17 @@ module {
     public let KB = 1024;
     public let MB = 1048576;
 
-    /// Create a get request.
+    /// Returns a request builder for a get request.
     public func get(url: Text): RequestBuilder = RequestBuilder
         .RequestBuilder(url)
         .method(Method.Get);
 
-    /// Create a post request.
+    /// Returns a request builder for a post request.
     public func post(url: Text): RequestBuilder = RequestBuilder
         .RequestBuilder(url)
         .method(Method.Post);
     
-    /// Create a head request.
+    /// Returns a request builder for a put request.
     public func head(url: Text): RequestBuilder = RequestBuilder
         .RequestBuilder(url)
         .method(Method.Head);

@@ -1,12 +1,14 @@
-# Web API
+# Web I/O
+
+This library provides a high-level API for making HTTP requests and interacting with the web from a Motoko canister.
 
  > This is still a work in progress. The API is not stable and is subject to change.
  
- This is an example of how the `web-api` can be used once it is fully implemented.
+ This is an example of how the `web-io` library could be used once it is fully implemented.
 ## outcall
 ```motoko
-    import outcall "mo:web-api/outcall";
-    import Response "mo:web-api/Response";
+    import outcall "mo:web-io/outcall";
+    import Response "mo:web-io/Response";
 
     type JokeObj = {
         setup : Text;
@@ -23,13 +25,12 @@
         let res = Response.fromCanisterHttp(raw_res);
 
         let json_blob = res.strict_json();
-        let joke : ?JokeObj = from_candid(json_blob);
-
+        return from_candid(json_blob);
     };
 ```
 ## Router
 ```motoko
-    import Router "mo:web-api/Router";
+    import Router "mo:web-io/Router";
 
     let router = Router.Router();
 
