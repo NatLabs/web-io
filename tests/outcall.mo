@@ -1,44 +1,48 @@
+// @testmode wasi
 import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
 import Text "mo:base/Text";
 
-import ActorSpec "./utils/ActorSpec";
+import { suite; test } "mo:test";
 
-import File "../src/outcall";
+import outcall "../src/outcall";
 
-let {
-    assertTrue;
-    assertFalse;
-    assertAllTrue;
-    describe;
-    it;
-    skip;
-    pending;
-    run;
-} = ActorSpec;
+suite(
+    "Testing outcall",
+    func() {
+        test(
+            "Get request",
+            func() {
+                let res = outcall.get("example.com/users/random_user").add_query("name", "John").add_query("age", "42").header("Accept", "application/json").header("X-Request-Id", "12345").build();
 
-let success = run([
-    describe(
-        "File",
-        [
-            it(
-                "append blob",
-                do {
+                assert res.method == "GET";
 
-                    outcall.fetch()
+                assert res.url.host == "example.com";
+                assert res.url.path == "/users/random_user";
 
-                    assertTrue(
-                        file.blob() == file.slice(0, 11),
-                    );
-                },
-            ),
-        ],
-    ),
-]);
+                assert res.query_map.get("name") == ?"John";
+                assert res.query_map.get("age") == ?"42";
 
-if (success == false) {
-    Debug.trap("\1b[46;41mTests failed\1b[0m");
-} else {
-    Debug.print("\1b[23;42;3m Success!\1b[0m");
-};
+                type Details = {
+                    name : Text;
+                    age : Nat;
+                    number : ?Text;
+                };
+
+                let ?user_details : ?Details = from_candid (res.query_candid()) else {
+                    assert false;
+                    return;
+                };
+
+                assert user_details.name == "John";
+                assert user_details.age == 42;
+                assert user_details.number == null;
+
+                assert res.headers.get("Accept") == ?"application/json";
+                assert res.headers.get("X-Request-Id") == ?"12345";
+
+            },
+        );
+    },
+);

@@ -9,6 +9,7 @@ import Nat16 "mo:base/Nat16";
 import serde_json "mo:serde/JSON";
 import Mo "mo:moh";
 
+
 import Headers "Headers";
 import Response "Response";
 import T "Types";
@@ -22,7 +23,7 @@ module {
     ///   Users have to use the default `StreamingToken` type which consists of a key and a value.
     public class ResponseBuilder() = self {
         var _status_code : Nat16 = 200;
-        var _update = false;
+        var _upgrade = false;
         var _body : Blob = "";
         let _headers = Headers.Headers();
         var _streaming_strategy : ?T.StreamingStrategy = null;
@@ -34,10 +35,10 @@ module {
             self;
         };
 
-        /// Sets the `update` flag of the response.
+        /// Sets the `upgrade` flag of the response.
         /// If true, the response will be resent to the `http_request_update()` function in the canister.
-        public func update(val : Bool) : ResponseBuilder {
-            _update := val;
+        public func upgrade(val : Bool) : ResponseBuilder {
+            _upgrade := val;
             self;
         };
 
@@ -120,26 +121,26 @@ module {
             self;
         };
 
-        /// Returns a `Response` object.
+        /// Returns a [`Response`](./response.md#type-response) object.
         public func build() : Response.Response {
-            Response.Response(
-                _status_code,
-                _body,
-                ?{
-                    headers = ?_headers;
-                    update = _update;
-                    streaming_strategy = _streaming_strategy;
-                },
-            );
+            let initData : Response.ResponseInitData = {
+                status_code = _status_code;
+                headers = ?_headers;
+                body = _body;
+                upgrade = _upgrade;
+                streaming_strategy = _streaming_strategy;
+            };
+
+            Response.Response(initData);
         };
 
-        /// Returns a `HttpResponse` record.
+        /// Returns a [HttpResponse](./types.md#type-httpresponse) record.
         public func build_http() : T.HttpResponse {
             {
                 status_code = _status_code;
                 headers = Headers.toArray(_headers);
                 body = _body;
-                update = ?_update;
+                upgrade = ?_upgrade;
                 streaming_strategy = _streaming_strategy;
             };
         };

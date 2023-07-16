@@ -24,24 +24,46 @@ module {
     };
 
     /// The Request class represents an HTTP request and provides helpful methods
-    public class Request(_method : Text, _url : Text, options : ?RequestOptions) {
-        public let url = URL.URL(_url);
-        public let method = _method;
+    /// Read-only information about an HTTP request
+    /// Use the `RequestBuilder` to create a `Request` object
 
-        var _body = Option.get<Blob>(do ? { options!.body! }, "");
+    public type RequestInitData = {
+        method : Text;
+        url : URL.URL;
+        body : Blob; // #form | #bytes;
+        headers : Headers.Headers;
+        caller : ?Principal.Principal;
+        params : ?TrieMap.TrieMap<Text, Text>;
+    };
 
-        public let headers = Option.get(do ? { options!.headers! }, Headers.Headers());
+    public class Request(init : RequestInitData) {
+        /// A URL object created from the url sent in the request
+        public let url = init.url;
+
+        /// Reference to the query parameter map in the URL object.
+        public let query_map = url.query_map;
+
+        /// Function to serialize the query parameters in the URL object to a candid blob.
+        public let query_candid = url.query_candid;
+
+        /// Function for converting the query parameters in the URL object to a Text.
+        public let query_text = url.query_text;
+
+        /// The HTTP method of the request
+        public let method = init.method;
+
+        var _body = init.body;
+
+        /// The headers of the request as a Headers object
+        public let headers = init.headers;
 
         /// The caller of the request, if available. If the caller is not available, the **anonymous** principal is used.
-        public let caller = Option.get(do ? { options!.shared_msg!.caller }, Principal.fromText("2vxsx-fae"));
+        public let caller = Option.get(init.caller, Principal.fromText("2vxsx-fae"));
 
         /// The path parameters extrancted from the url.
         /// The path parameters are the parts of the url that are prefixed with a colon when setting a route in the Router.
         /// For example, in the url `/users/:id`, the path parameter is `id`.
-        public let params = TrieMap.TrieMap<Text, Text>(Text.equal, Text.hash);
-
-        /// Reference to the query parameter map in the URL object.
-        public let query_map = url.query_map;
+        public let params = Option.get(init.params, TrieMap.TrieMap<Text, Text>(Text.equal, Text.hash));
 
         /// Returns the request body as a Blob
         public func blob() : Blob = _body;
@@ -73,11 +95,11 @@ module {
                 case (null) {};
             };
 
-            let parsed_form = switch(Form.parse_with_headers(_body, headers)) {
-                case (?form)  form;
+            let parsed_form = switch (Form.parse_with_headers(_body, headers)) {
+                case (?form) form;
                 case (null) Form.Form();
             };
-            
+
             cached_form := ?parsed_form;
             parsed_form;
         };
@@ -105,29 +127,16 @@ module {
 
         let url = host # path;
 
-        let request = Request(
-            method,
-            url,
-            ?{
-                body = ?body;
-                headers = ?headers;
-                shared_msg = null;
-            },
-        );
+        let request = Request({
+            method;
+            url = URL.URL(url);
+            body;
+            headers;
+            caller = null;
+            params = null;
+        });
 
         request;
     };
 
-    public func Get(url : Text) : Request = Request(Method.Get, url, null);
-    public func Delete(url : Text) : Request = Request(Method.Delete, url, null);
-
-    let default_options : RequestOptions = {
-        headers = null;
-        body = null;
-        shared_msg = null;
-    };
-
-    public func Post(url : Text, body : Blob) : Request = Request(Method.Post, url, ?{ default_options with body = ?body });
-    public func Put(url : Text, body : Blob) : Request = Request(Method.Put, url, ?{ default_options with body = ?body });
-    public func Patch(url : Text, body : Blob) : Request = Request(Method.Patch, url, ?{ default_options with body = ?body });
 };

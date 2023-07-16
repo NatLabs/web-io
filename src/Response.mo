@@ -1,3 +1,6 @@
+/// The `Response` class is a read-only representation of a http response with utility methods for accessing the response data.
+/// Response objects should be instantiated using the `ResponseBuilder` or the `Response.fromCanisterHttp` and `Response.fromHttpResponse` methods.
+
 import TrieMap "mo:base/TrieMap";
 import Iter "mo:base/Iter";
 import Text "mo:base/Text";
@@ -15,18 +18,26 @@ import T "Types";
 module {
 
     public type ResponseOptions = {
-        update : Bool;
+        upgrade : Bool;
         streaming_strategy : ?T.StreamingStrategy;
         headers : ?Headers.Headers;
     };
 
-    public class Response(_status_code : Nat16, __body: Blob, options : ?ResponseOptions) {
-        public let status_code = _status_code;
-        public let update = Option.get(do ? { options!.update }, false);
-        public let headers = Option.get(do ? { options!.headers! }, Headers.Headers());
-        public let streaming_strategy = do ? { options!.streaming_strategy!};
+    public type ResponseInitData = {
+        status_code : Nat16;
+        body : Blob;
+        upgrade : Bool;
+        streaming_strategy : ?T.StreamingStrategy;
+        headers : ?Headers.Headers;
+    };
 
-        var _body = __body;
+    public class Response(init: ResponseInitData) {
+        public let status_code = init.status_code;
+        public let upgrade = Option.get(do ? { init.upgrade }, false);
+        public let headers = Option.get(do ? { init.headers! }, Headers.Headers());
+        public let streaming_strategy = do ? { init.streaming_strategy!};
+
+        var _body = init.body;
 
         public func blob() : Blob = _body;
         public func text() : ?Text = Text.decodeUtf8(_body);
@@ -38,6 +49,7 @@ module {
         public func json() : ?Blob {
             Option.map(text(), serde_json.fromText);
         };
+
         public func strict_json() : Blob {
             switch (Option.map(text(), serde_json.fromText)) {
                 case (?b) { b };
@@ -55,14 +67,16 @@ module {
         for (header in res.headers.vals()) {
             headers.add(header.name, header.value);
         };
-
-        let options = {
-            update = false;
+     
+        let initData : ResponseInitData = {
+            status_code = Nat16.fromNat(res.status);
+            body = Blob.fromArray(res.body);
+            upgrade = false;
             streaming_strategy = null;
             headers = ?headers;
         };
 
-        Response(Nat16.fromNat(res.status), Blob.fromArray(res.body), ?options);
+        Response(initData);
     };
 
     public func fromHttpResponse(res : T.HttpResponse) : Response {
@@ -72,13 +86,15 @@ module {
             headers.add(key, val);
         };
 
-        let options = {
-            update = if (res.update == ?true) true else false;
-            streaming_strategy = res.streaming_strategy;
+        let initData : ResponseInitData = {
+            status_code = res.status_code;
+            body = res.body;
+            upgrade = false;
+            streaming_strategy = null;
             headers = ?headers;
         };
 
-        Response(res.status_code, res.body, ?options);
+        Response(initData);
     };
 
     public func toHttpResponse(res : Response) : T.HttpResponse {
@@ -86,7 +102,7 @@ module {
             status_code = res.status_code;
             headers = Iter.toArray(res.headers.entries());
             body = res.blob();
-            update = ?res.update;
+            upgrade = ?res.upgrade;
             streaming_strategy = res.streaming_strategy;
         };
     };

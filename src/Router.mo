@@ -27,6 +27,7 @@ module {
 
     public type Request = Request.Request;
     public type Response = Response.Response;
+    public type Candid = T.Candid;
 
     public type ResponseBuilder = RB.ResponseBuilder;
     public type HttpRequest = T.HttpRequest;
@@ -306,64 +307,64 @@ module {
             res.build_http();
         };
 
-        func handle_async_request(http_req : T.HttpRequest) : async* T.HttpResponse {
-            let req = Request.fromHttpRequest(http_req);
-            let ?{handler; params} = get_handler_details(req) else return not_found(req);
+        // func handle_async_request(http_req : T.HttpRequest) : async* T.HttpResponse {
+        //     let req = Request.fromHttpRequest(http_req);
+        //     let ?{handler; params} = get_handler_details(req) else return not_found(req);
 
-            for ((key, value) in params.entries()) {
-                req.params.put(key, value);
-            };
+        //     for ((key, value) in params.entries()) {
+        //         req.params.put(key, value);
+        //     };
 
-            let res = RB.ResponseBuilder();
+        //     let res = RB.ResponseBuilder();
 
-            switch (handler) {
-                case (#Async(handler)) await* handler(req, res);
-                case (#Sync(handler)) handler(req, res);
-            };
+        //     switch (handler) {
+        //         case (#Async(handler)) await* handler(req, res);
+        //         case (#Sync(handler)) handler(req, res);
+        //     };
 
-            res.build_http();
-        };
+        //     res.build_http();
+        // };
 
         /// Processes a request for the `http_request` function
-        public func process_request(http_req : T.HttpRequest, message : SharedMessage) : T.HttpResponse {
+        public func process_request(http_req : T.HttpRequest, message : ?SharedMessage) : T.HttpResponse {
             if (
                 http_req.method == Method.Get or http_req.method == Method.Head,
             ) {
                 handle_sync_request(http_req);
             } else {
-                Debug.print("re-routing async request: " # http_req.method # ", " # http_req.url);
+                // Debug.print("re-routing async request: " # http_req.method # ", " # http_req.url);
                 RB.ResponseBuilder()
                     .status(Status.NoContent)
-                    .update(true)
+                    .upgrade(true)
                     .build_http();
             };
         };
 
         /// Processes a request for the `http_request_update` function
-        public func process_request_update(http_req : T.HttpRequest, message : SharedMessage) : T.HttpResponse {
+        public func process_request_update(http_req : T.HttpRequest, message : ?SharedMessage) : T.HttpResponse {
             if (has_async_route) Debug.trap("Router has async routes, but called sync handler (process_request_update()). \nTry using process_async_update_request() instead.");
             handle_sync_request(http_req);
         };
 
         // Could be used for inter-canister query calls
 
-        public func process_async_request(http_req : T.HttpRequest, message : SharedMessage) : async* T.HttpResponse {
-            if (
-                http_req.method == Method.Get or http_req.method == Method.Head,
-            ) {
-                await* handle_async_request(http_req);
-            } else {
-                Debug.print("re-routing async request: " # http_req.method # ", " # http_req.url);
-                RB.ResponseBuilder()
-                    .status(Status.NoContent)
-                    .update(true)
-                    .build_http();
-            };
-        };
+        // public func process_async_request(http_req : T.HttpRequest, message : ?SharedMessage) : async* T.HttpResponse {
+        //     if (
+        //         http_req.method == Method.Get or http_req.method == Method.Head,
+        //     ) {
+        //         await* handle_async_request(http_req);
+        //     } else {
+        //         Debug.print("re-routing async request: " # http_req.method # ", " # http_req.url);
+        //         RB.ResponseBuilder()
+        //             .status(Status.NoContent)
+        //             .upgrade(true)
+        //             .build_http();
+        //     };
+        // };
 
-        public func process_async_update_request(http_req : T.HttpRequest, message : SharedMessage) : async* T.HttpResponse {
-            await* handle_async_request(http_req);
-        };
+        // public func process_async_update_request(http_req : T.HttpRequest, message : ?SharedMessage) : async* T.HttpResponse {
+        //     await* handle_async_request(http_req);
+        // };
 
         public func get(endpoint : Text, callback : SyncRouterHandler) {
             add_handler([Method.Get], endpoint, #Sync(callback));
@@ -385,23 +386,23 @@ module {
             add_handler([Method.Patch], endpoint, #Sync(callback));
         };
 
-        // Functions for setting up async update route handlers
+        // Functions for setting up async upgrade route handlers
 
-        public func post_async(endpoint : Text, callback : AsyncRouterHandler) {
-            add_handler([Method.Post], endpoint, #Async(callback));
-        };
+        // public func post_async(endpoint : Text, callback : AsyncRouterHandler) {
+        //     add_handler([Method.Post], endpoint, #Async(callback));
+        // };
 
-        public func delete_async(endpoint : Text, callback : AsyncRouterHandler) {
-            add_handler([Method.Delete], endpoint, #Async(callback));
-        };
+        // public func delete_async(endpoint : Text, callback : AsyncRouterHandler) {
+        //     add_handler([Method.Delete], endpoint, #Async(callback));
+        // };
 
-        public func patch_async(endpoint : Text, callback : AsyncRouterHandler) {
-            add_handler([Method.Patch], endpoint, #Async(callback));
-        };
+        // public func patch_async(endpoint : Text, callback : AsyncRouterHandler) {
+        //     add_handler([Method.Patch], endpoint, #Async(callback));
+        // };
 
-        public func put_async(endpoint : Text, callback : AsyncRouterHandler) {
-            add_handler([Method.Put], endpoint, #Async(callback));
-        };
+        // public func put_async(endpoint : Text, callback : AsyncRouterHandler) {
+        //     add_handler([Method.Put], endpoint, #Async(callback));
+        // };
 
     };
 };

@@ -24,7 +24,7 @@ actor {
         func(req : Router.Request, res : Router.ResponseBuilder) {
             Utils.debugRequestParser(req);
             
-            let optName = do ? { req.query_map.get("name")! };
+            let optName = req.query_map.get("name");
             let name = Option.get(optName, "");
 
             ignore res.html(Utils.htmlPage(name));
@@ -35,7 +35,7 @@ actor {
         "/",
         func(req : Router.Request, res : Router.ResponseBuilder){
             Utils.debugRequestParser(req);
-            let optName = do ? { req.query_map.get("name")! };
+            let optName = req.query_map.get("name");
             let name = Option.get(optName, "");
 
             ignore res.text(" Thanks " # name # " for submitting the form!");
@@ -48,7 +48,7 @@ actor {
     };
 
     public func get_joke() : async ?JokeObj {
-        let raw_res = await outcall
+        let raw_res = await* outcall
             .get("https://v2.jokeapi.dev/joke/Programming")
             .add_query("type", "twopart")
             .cycles(200_000_000)
@@ -61,11 +61,11 @@ actor {
     };
 
     public shared query (msg) func http_request(rawReq : Router.HttpRequest) : async  Router.HttpResponse {
-        router.process_request(rawReq, msg);
+        router.process_request(rawReq, ?msg);
     };
 
     public shared (msg) func http_request_update(rawReq : Router.HttpRequest) : async Router.HttpResponse {
-        router.process_request_update(rawReq, msg);
+        router.process_request_update(rawReq, ?msg);
     };
 
 };

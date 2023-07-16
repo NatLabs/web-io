@@ -7,6 +7,8 @@ import Nat16 "mo:base/Nat16";
 import Principal "mo:base/Principal";
 import Iter "mo:base/Iter";
 import Nat "mo:base/Nat";
+import Int "mo:base/Int";
+import Time "mo:base/Time";
 import Text "mo:base/Text";
 import Buffer "mo:base/Buffer";
 import Option "mo:base/Option";
@@ -14,7 +16,9 @@ import Cycles "mo:base/ExperimentalCycles";
 
 import serde_json "mo:serde/JSON";
 import { Method; Status } "mo:http/Http";
-import Base64 "mo:encoding-v0.4.1/Base64";
+import Base64 "mo:encoding/Base64";
+import fuzzText "mo:fuzz/Text";
+import fuzz "mo:fuzz";
 
 import URL "URL";
 import Request "Request";
@@ -42,8 +46,15 @@ module {
         var _form = Form.Form();
         var _cycles = 1_000_000_000;
 
+        let seed = Int.abs(Time.now());
+        let random_generator = fuzz.createGenerator(seed);
+        let randomText = fuzzText.FuzzText(random_generator);
+
         let KB : Nat64 = 1024;
         var _max_response_bytes = KB * 10;
+
+        // Set default headers
+        _headers.add("Host", _url.host # ":" # debug_show(_url.port));
 
         /// Adds a query parameter to the request.
         public func add_query(key: Text, val : Text) : RequestBuilder {
@@ -114,9 +125,9 @@ module {
         };
 
         /// Sets the request body to the given JSON blob.
-        public func json(json : Blob, keys : [Text]) : RequestBuilder {
+        public func json(candid : Blob, keys : [Text]) : RequestBuilder {
             _headers.put("Content-Type", "application/json");
-            _body := Text.encodeUtf8(serde_json.toText(json, keys));
+            _body := Text.encodeUtf8(serde_json.toText(candid, keys));
             self;
         };
 
@@ -221,17 +232,20 @@ module {
 
         /// Returns a Request object with helper functions for accessing the response data.
         public func build() : Request.Request {
-            Request.Request(_method, URL.toText(_url), ?{
-                headers = ?_headers;
-                shared_msg = null;
-                body = ?resolve_body();
+            Request.Request({
+                method = _method;
+                url = _url;
+                headers = _headers;
+                body = resolve_body();
+                caller = ?_caller;
+                params = null;
             })
         };
 
         /// Builds a `HttpRequest` record that is returned in the `http_request` and `http_request_update` functions.
         public func build_http() : T.HttpRequest {
             {
-                url = URL.toText(_url);
+                url = _url.text();
                 method = _method;
                 body = resolve_body();
                 headers = Headers.toArray(_headers);
@@ -240,7 +254,7 @@ module {
 
         /// Builds a `CanisterHttpRequest` record that is returned after making an outcall.
         public func build_canister_http() : T.CanisterHttpRequest = {
-            url = URL.toText(_url);
+            url = _url.text();
             max_response_bytes = ?_max_response_bytes;
             body = ?Blob.toArray(resolve_body());
             transform = _transform;
@@ -273,7 +287,7 @@ module {
             internet_computer : T.ManagementCanister,
             req : T.CanisterHttpRequest,
             first_res : T.CanisterHttpResponse,
-        ) : async [T.RedirectedResponse] {
+        ) : async* [T.RedirectedResponse] {
 
             let buffer = Buffer.Buffer<T.RedirectedResponse>(2);
 
@@ -315,22 +329,44 @@ module {
             Buffer.toArray(buffer);
         };
 
-        /// Send out the HTTP request and return the response.
-        public func send_request() : async T.OutcallResponse {
+        func _send_request() : async* T.OutcallResponse {
             let internet_computer : T.ManagementCanister = actor ("aaaaa-aa");
-
+            
             let req = build_canister_http();
 
             Cycles.add(Nat.min(_cycles, Cycles.balance()));
             let res = await internet_computer.http_request(req);
 
             let redirects = if (_follow_redirects) {
-                await redirect_request(internet_computer, req, res);
+                await* redirect_request(internet_computer, req, res);
             } else {
                 [];
             };
 
             { res with redirects };
+        };
+
+        /// Send out the HTTP request and return the response.
+        public func send_request() : async* T.OutcallResponse {
+            
+            if (_method == Method.Post){
+                // set idempotency key for this request
+                let idempotency_key = random_id();
+                _headers.add("Idempotency-Key", idempotency_key);
+            };
+
+            await* _send_request();
+        };
+
+        func random_id() : Text {
+            randomText.randomAlphanumeric(10);
+        };
+
+        public func retry() : async* T.OutcallResponse {
+            if (_headers.get("Idempotency-Key") == null){
+                Debug.trap("This request has not been sent yet. Try calling 'send_request()' first");
+            };
+            await* _send_request();
         };
     };
 };

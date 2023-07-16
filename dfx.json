@@ -1,6 +1,5 @@
 {
     "version": 1,
-    "dfx": "0.13.1",
     "canisters": {
         "form": {
           "type": "motoko",
@@ -9,6 +8,10 @@
         "http_counter" : {
             "type": "motoko",
             "main": "example/http_counter.mo"
+        },
+        "post-request" : {
+            "type": "motoko",
+            "main": "example/example/main.mo"
         }
       },
     "defaults": {

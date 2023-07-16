@@ -3,30 +3,12 @@ import Text "mo:base/Text";
 import Prim "mo:⛔";
 import Prelude "mo:base/Prelude";
 
-import Router "../src/Router"; // import Router "mo:web-api/Router";
+import { Router } "../src"; // import { Router } "mo:web-api";
 
 // This is a simple counter canister from the dfinity examples, rewritten using the web-api library.
 // original - https://github.com/dfinity/examples/blob/master/motoko/http_counter/src/main.mo
 
 actor HttpCounter {
-
-    public query func http_streaming(token : Router.StreamingToken) : async Router.StreamingResponse {
-        let next_index = token.index + 1;
-
-        let body = switch (token.index) {
-            case (1) Text.encodeUtf8(" is ");
-            case (2) Text.encodeUtf8(Nat.toText(counter));
-            case (3) Text.encodeUtf8(" streaming\n");
-            case (_) Prelude.unreachable();
-        };
-
-        let next_token = if (token.index >= 3) { null } else {
-            ?{ token with index = next_index };
-        };
-
-        { body; token = next_token};
-    };
-
     stable var counter : Nat = 0;
 
     let router = Router.Router();
@@ -37,15 +19,6 @@ actor HttpCounter {
             case (_) false;
         };
     };
-
-    router.get(
-        "/stream", 
-        func (req: Router.Request, res: Router.ResponseBuilder) {
-            ignore res
-                .text("Counter")
-                .streaming(http_streaming, ?{key = ""; index = 1});
-        }
-    );
 
     router.get(
         "*",
@@ -80,6 +53,29 @@ actor HttpCounter {
         }
     );
 
+    let response = ["Counter", " is ", Nat.toText(counter), " streaming\n"];
+
+    public query func http_streaming(token : Router.StreamingToken) : async Router.StreamingResponse {
+
+        let (text, next_token) = switch (token) {
+            case (#Nat(1)) (response[1], ?#Nat(2));
+            case (#Nat(2)) (response[2], ?#Nat(3));
+            case (#Nat(3)) (response[3], null);
+            case (_) Prelude.unreachable();
+        };
+
+        { body = Text.encodeUtf8(text); token = next_token};
+    };
+
+    router.get(
+        "/stream", 
+        func (req: Router.Request, res: Router.ResponseBuilder) {
+            ignore res
+                .text(response[0])
+                .streaming(http_streaming, ?#Nat(1)); // pass the streaming function and the initial token
+        }
+    );
+
     router.error(
         func (req: Router.Request, res: Router.ResponseBuilder) {
             ignore res
@@ -89,11 +85,11 @@ actor HttpCounter {
     );
 
     public query (msg) func http_request(req : Router.HttpRequest) : async Router.HttpResponse {
-        router.process_request(req, msg);
+        router.process_request(req, ?msg);
     };
 
     public shared (msg) func http_request_update(req : Router.HttpRequest) : async Router.HttpResponse {
-        router.process_request_update(req, msg);
+        router.process_request_update(req, ?msg);
     };
 
 };
