@@ -43,7 +43,7 @@ module {
 
         let { url; query_map } = req;
 
-        Debug.print(format("URl ({})", [(url.text)]));
+        Debug.print(format("URl ({})", [(url.text())]));
 
         Debug.print(format("Protocol ({})", [debug_show (url.protocol)]));
 

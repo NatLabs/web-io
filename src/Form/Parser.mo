@@ -102,11 +102,6 @@ module {
         ?entries;
     };
 
-    // func decode_ascii(text: Text): Blob {
-    //     let ?res = Text.encodeUtf8(text) else return Prelude.unreachable();
-    //     res
-    // };
-
     func skip_expected(bytes : PeekableIter<Nat8>, expected_text : Text) {
         var expected = Text.encodeUtf8(expected_text).vals();
 

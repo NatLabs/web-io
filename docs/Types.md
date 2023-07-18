@@ -44,7 +44,7 @@ type HttpResponse = { status_code : Nat16; body : Blob; headers : [HeaderField];
 
 ## Type `URL`
 ``` motoko no-repl
-type URL = { original : Text; protocol : Text; port : Nat16; host : { original : Text; array : [Text] }; path : { original : Text; array : [Text] }; queryObj : { original : Text; get : (Text) -> ?Text; trieMap : TrieMap.TrieMap<Text, Text>; keys : [Text] }; anchor : Text }
+type URL = { text : Text; protocol : Text; port : Nat16; host : Text; path : Text; segments : [Text]; query_map : TrieMap.TrieMap<Text, Text>; query_text : () -> Text; query_candid : () -> Blob; anchor : Text }
 ```
 
 

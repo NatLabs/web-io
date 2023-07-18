@@ -90,7 +90,7 @@ module {
     /// Returns the original text is it contains a space or any invalid characters
     public func formatKey(field_key : Text) : Text {
         let dashed = Text.replace(field_key, #char ' ', "-");
-        let words = Text.split(dashed, #char '-');
+        let words = Text.tokens(dashed, #char '-');
 
         let capitalized = Iter.map<Text, Text>(
             words,

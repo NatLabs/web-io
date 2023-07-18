@@ -98,7 +98,7 @@ module {
             case (#multipart { boundary })  parse_multipart(data, boundary);
             case (#urlencoding) {
                 let ?text = Text.decodeUtf8(data) else return null;
-                let ?fields = UrlEncoding.fromText(text) else return null;
+                let ?fields = UrlEncoding.parse(text) else return null;
 
                 let form : Form = {
                     fields;

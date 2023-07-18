@@ -1,7 +1,10 @@
 import Buffer "mo:base/Buffer";
 import TrieMap "mo:base/TrieMap";
+import Candid "mo:serde/Candid";
 
 module {
+
+    public type Candid = Candid.Candid;
 
     // incoming http request data types
     public type HeaderField = (Text, Text);
@@ -13,10 +16,7 @@ module {
         headers : [HeaderField];
     };
 
-    public type StreamingToken = {
-        key : Text;
-        index : Nat;
-    };
+    public type StreamingToken = Candid;
 
     public type StreamingResponse = {
         token : ?StreamingToken;
@@ -36,29 +36,22 @@ module {
         status_code : Nat16;
         body : Blob;
         headers : [HeaderField];
-        update : ?Bool;
+        upgrade : ?Bool;
         streaming_strategy : ?StreamingStrategy;
     };
 
     // Data types used by this module
+
     public type URL = {
-        original : Text;
+        text : Text;
         protocol : Text;
         port : Nat16;
-        host : {
-            original : Text;
-            array : [Text];
-        };
-        path : {
-            original : Text;
-            array : [Text];
-        };
-        queryObj : {
-            original : Text;
-            get : (Text) -> ?Text;
-            trieMap : TrieMap.TrieMap<Text, Text>;
-            keys : [Text];
-        };
+        host : Text;
+        path : Text;
+        segments : [Text];
+        query_map : TrieMap.TrieMap<Text, Text>;
+        query_text: () -> Text;
+        query_candid : () -> Blob;
         anchor : Text;
     };
 
@@ -95,7 +88,7 @@ module {
         size : Nat;
         form : Form;
         text : () -> Text;
-        // deserialize : () -> ?Blob;
+        // serialize : () -> ?Blob;
         file : () -> ?Buffer.Buffer<Nat8>;
         bytes : (start : Nat, end : Nat) -> Buffer.Buffer<Nat8>;
     };
@@ -168,4 +161,37 @@ module {
     public type ManagementCanister = actor {
         http_request : CanisterHttpRequest -> async CanisterHttpResponse;
     };
+
+    public type Request = {
+
+    };
+
+    public type RequestBuilderInterface<Builder> = {
+        add_query : (Text, Text) -> RequestBuilderInterface<Builder>;
+        auth : (Text, Text) -> Builder;
+        bearer_token : Text -> Builder;
+        blob : Blob -> Builder;
+        build : () -> Any;
+        build_canister_http : () -> CanisterHttpRequest;
+        build_http : () -> HttpRequest;
+        caller : Principal -> Builder;
+        cookie : (Text, Text) -> Builder;
+        cycles : Nat -> Builder;
+        file : (Text, File) -> Builder;
+        files : [(Text, File)] -> Builder;
+        follow_redirects : Bool -> Builder;
+        form_field : (Text, Text) -> Builder;
+        form_fields : [(Text, Text)] -> Builder;
+        header : (Text, Text) -> Builder;
+        headers : [HeaderField] -> Builder;
+        html : Text -> Builder;
+        json : (Blob, [Text]) -> Builder;
+        max_bytes : Nat64 -> Builder;
+        max_redirects : Nat -> Builder;
+        method : Text -> Builder;
+        queries : [(Text, Text)] -> Builder;
+        send_request : () -> OutcallResponse;
+        text : Text -> Builder;
+        transform : ?TransformContext -> Builder
+    }
 };

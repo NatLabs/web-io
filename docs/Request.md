@@ -8,6 +8,31 @@
 let url
 ```
 
+A URL object created from the url sent in the request
+
+
+### Value `query_map`
+``` motoko no-repl
+let query_map
+```
+
+Reference to the query parameter map in the URL object.
+
+
+### Value `query_candid`
+``` motoko no-repl
+let query_candid
+```
+
+Function to serialize the query parameters in the URL object to a candid blob.
+
+
+### Value `query_text`
+``` motoko no-repl
+let query_text
+```
+
+Function for converting the query parameters in the URL object to a Text.
 
 
 ### Value `method`
@@ -15,6 +40,7 @@ let url
 let method
 ```
 
+The HTTP method of the request
 
 
 ### Value `headers`
@@ -22,6 +48,7 @@ let method
 let headers
 ```
 
+The headers of the request as a Headers object
 
 
 ### Value `caller`
@@ -40,14 +67,6 @@ let params
 The path parameters extrancted from the url.
 The path parameters are the parts of the url that are prefixed with a colon when setting a route in the Router.
 For example, in the url `/users/:id`, the path parameter is `id`.
-
-
-### Value `query_map`
-``` motoko no-repl
-let query_map
-```
-
-Reference to the query parameter map in the URL object.
 
 
 ### Function `blob`

@@ -13,11 +13,13 @@ import UrlEncoding "UrlEncoding";
 
 module {
 
+    /// A URL class for parsing and manipulating URLs.
     public class URL(url : Text) {
 
         var xs = url;
         var includes_protocol = false;
 
+        /// The protocol of the URL, e.g. "http" or "https".
         public let protocol = if (Text.startsWith(xs, #text("http://"))) {
             xs := Mo.Text.stripStart(xs, #text("http://"));
             includes_protocol := true;
@@ -56,6 +58,7 @@ module {
 
         let anch = Iter.toArray(Text.split(xs, #char('#')));
 
+        /// The anchor of the URL.
         public let anchor = switch (anch.size()) {
             case (0) { "" };
             case (1) { "" };
@@ -78,21 +81,37 @@ module {
             };
         };
 
-        public let query_map = switch(UrlEncoding.fromText(_query_text)){
+        /// Returns the TrieMap where the query parameters are stored.
+        public let query_map = switch(UrlEncoding.parse(_query_text)){
             case (?map) map;
             case (null) Debug.trap("URL parsing error: Invalid query string (" # _query_text # ")");
         };
 
+        /// Returns the serialized candid blob of the query parameters.
+        public func query_candid() : Blob = UrlEncoding.serialize(query_map);
+
+        /// Returns the query parameters as a Text.
         public func query_text() : Text = UrlEncoding.toText(query_map);
 
-        public let path = xs;
-        public let segments = Iter.toArray(Text.tokens(path, #char('/')));
+        /// Returns the segments of the path of the URL.
+        public let segments = Iter.toArray(Text.tokens(xs, #char('/')));
+
+        /// Returns the path of the URL. 
+        public let path =  "/" # Text.join("/", segments.vals());
 
         let _protocol = if (includes_protocol) { protocol # "://" } else { "" };
-        public let text = _protocol # authority # path;
-    };
+        let _anchor = if (anchor != "") { "#" # anchor } else { "" };
+        
+        /// Returns the URL as a Text excluding the query parameters.
+        public func text() : Text {
 
-    public func toText(url: URL) : Text {
-        url.text # "?" # url.query_text();
+            let _query_text = query_text();
+
+            if (_query_text == "") {
+                return _protocol # authority # path # _anchor;
+            };
+
+            _protocol # authority # path # "?" # _query_text  # _anchor;
+        }
     };
 };

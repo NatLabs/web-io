@@ -8,6 +8,7 @@
 let protocol
 ```
 
+The protocol of the URL, e.g. "http" or "https".
 
 
 ### Value `anchor`
@@ -15,6 +16,7 @@ let protocol
 let anchor
 ```
 
+The anchor of the URL.
 
 
 ### Value `query_map`
@@ -22,6 +24,15 @@ let anchor
 let query_map
 ```
 
+Returns the TrieMap where the query parameters are stored.
+
+
+### Function `query_candid`
+``` motoko no-repl
+func query_candid() : Blob
+```
+
+Returns the serialized candid blob of the query parameters.
 
 
 ### Function `query_text`
@@ -29,6 +40,7 @@ let query_map
 func query_text() : Text
 ```
 
+Returns the query parameters as a Text.
 
 
 ### Value `path`
@@ -36,6 +48,7 @@ func query_text() : Text
 let path
 ```
 
+Returns the path of the URL. 
 
 
 ### Value `segments`
@@ -43,16 +56,13 @@ let path
 let segments
 ```
 
+Returns the segments of the path of the URL.
 
 
-### Value `text`
+### Function `text`
 ``` motoko no-repl
-let text
+func text() : Text
 ```
 
-
-## Function `toText`
-``` motoko no-repl
-func toText(url : URL) : Text
-```
-
+Returns the URL as a Text excluding the query parameters.
+A URL class for parsing and manipulating URLs.

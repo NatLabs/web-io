@@ -30,7 +30,7 @@ for TEST in $TESTS_FILES
         then 
             echo "Compiling $TEST"
             rm -f $WASM
-            $(vessel bin)/moc $LIBS -wasi-system-api $TEST -o $WASM
+            $(mocv bin current)/moc $LIBS -wasi-system-api $TEST -o $WASM
             IS_COMPILED=1
         fi
 
@@ -38,7 +38,7 @@ for TEST in $TESTS_FILES
         then 
             echo "Compiling because $SRC_FILE changed" 
             rm -f $WASM
-            $(vessel bin)/moc $LIBS -wasi-system-api $TEST -o $WASM
+            $(mocv bin current)/moc $LIBS -wasi-system-api $TEST -o $WASM
             IS_COMPILED=1
         fi
 
@@ -51,7 +51,7 @@ for TEST in $TESTS_FILES
                     if [ $NESTED_FILE -nt $WASM ]
                     then 
                         echo "Compiling because $NESTED_FILE changed"
-                        $(vessel bin)/moc $LIBS -wasi-system-api $TEST -o $WASM
+                        $(mocv bin current)/moc $LIBS -wasi-system-api $TEST -o $WASM
                         IS_COMPILED=1
                         break
                     fi
