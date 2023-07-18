@@ -5,7 +5,7 @@ import Iter "mo:base/Iter";
 import Text "mo:base/Text";
 import TrieMap "mo:base/TrieMap";
 
-import serde_urlencoded "mo:serde/UrlEncoded";
+import { URLEncoded = SerdeURLEncoded } "mo:serde";
 import Mo "mo:moh";
 
 import File "File";
@@ -77,12 +77,12 @@ module {
     };
 
     public func deserialize(blob : Blob, keys : [Text]) : UrlEncoding {
-        let text = serde_urlencoded.toText(blob, keys);
+        let text = SerdeURLEncoded.toText(blob, keys, null);
         fromText(text); 
     };
     
     public func serialize(map: UrlEncoding): Blob {
         let text = toText(map);
-        serde_urlencoded.fromText(text);
+        SerdeURLEncoded.fromText(text, null);
     };
 };

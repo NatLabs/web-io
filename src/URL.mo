@@ -101,8 +101,17 @@ module {
 
         let _protocol = if (includes_protocol) { protocol # "://" } else { "" };
         let _anchor = if (anchor != "") { "#" # anchor } else { "" };
-
+        
         /// Returns the URL as a Text excluding the query parameters.
-        public func text() : Text = _protocol # authority # path # "?" # query_text() # _anchor;
+        public func text() : Text {
+
+            let _query_text = query_text();
+
+            if (_query_text == "") {
+                return _protocol # authority # path # _anchor;
+            };
+
+            _protocol # authority # path # "?" # _query_text  # _anchor;
+        }
     };
 };

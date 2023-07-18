@@ -10,7 +10,7 @@ import Debug "mo:base/Debug";
 import Buffer "mo:base/Buffer";
 import Nat16 "mo:base/Nat16";
 
-import serde_json "mo:serde/JSON";
+import { JSON } "mo:serde";
 
 import Headers "Headers";
 import T "Types";
@@ -47,15 +47,17 @@ module {
         };
 
         public func json() : ?Blob {
-            Option.map(text(), serde_json.fromText);
+            let ?t = text() else return null;
+            ?JSON.fromText(t, null);
         };
 
         public func strict_json() : Blob {
-            switch (Option.map(text(), serde_json.fromText)) {
-                case (?b) { b };
+            switch (text(), ) {
+                case (?t) { JSON.fromText(t, null) };
                 case (null) { Debug.trap("Failed to decode response body as JSON") };
             };
         };
+
         public func bytes() : [Nat8] = Blob.toArray(_body);
         public func buffer() : Buffer.Buffer<Nat8> = Buffer.fromArray(bytes());
         public func size() : Nat = _body.size();

@@ -6,7 +6,7 @@ import Option "mo:base/Option";
 import Blob "mo:base/Blob";
 import Nat16 "mo:base/Nat16";
 
-import serde_json "mo:serde/JSON";
+import { JSON } "mo:serde";
 import Mo "mo:moh";
 
 
@@ -85,7 +85,7 @@ module {
             if (not is_ctype_set) {
                 _headers.put("Content-Type", "application/json");
             };
-            _body := Text.encodeUtf8(serde_json.toText(json, keys));
+            _body := Text.encodeUtf8(JSON.toText(json, keys, null));
             self;
         };
 

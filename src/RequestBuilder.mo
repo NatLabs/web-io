@@ -14,7 +14,7 @@ import Buffer "mo:base/Buffer";
 import Option "mo:base/Option";
 import Cycles "mo:base/ExperimentalCycles";
 
-import serde_json "mo:serde/JSON";
+import { JSON } "mo:serde";
 import { Method; Status } "mo:http/Http";
 import Base64 "mo:encoding/Base64";
 import fuzzText "mo:fuzz/Text";
@@ -29,6 +29,21 @@ import Headers "Headers";
 import T "Types";
 
 module {
+
+    public type InternalState = {
+        _url : URL.URL;
+        _method : Text;
+        _headers : Headers.Headers;
+        _caller : Principal;
+        _transform : ?T.TransformContext;
+        _body : Blob;
+        _follow_redirects : Bool;
+        _max_redirects : Nat;
+        _form : Form.Form;
+        _cycles : Nat;
+        _max_response_bytes : Nat64;
+        
+    };
 
     /// A request builder for making HTTP requests.
     ///
@@ -127,7 +142,7 @@ module {
         /// Sets the request body to the given JSON blob.
         public func json(candid : Blob, keys : [Text]) : RequestBuilder {
             _headers.put("Content-Type", "application/json");
-            _body := Text.encodeUtf8(serde_json.toText(candid, keys));
+            _body := Text.encodeUtf8(JSON.toText(candid, keys, null));
             self;
         };
 

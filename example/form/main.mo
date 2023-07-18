@@ -4,7 +4,7 @@ import Option "mo:base/Option";
 import Text "mo:base/Text";
 
 import Mo "mo:moh";
-import serde_json = "mo:serde/JSON";
+import JSON = "mo:serde/JSON";
 
 import outcall "../../src/outcall"; // replace with 'import Router "mo:web/Router";''
 import Router "../../src/Router"; // replace with 'import Router "mo:web/Router";''

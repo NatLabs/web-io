@@ -1,7 +1,7 @@
 [dependencies]
 base = "0.8.1"
-itertools = "0.1.1"
-serde = "0.2.0"
+itertools = "0.1.2"
+serde = "1.0.2"
 http = "https://github.com/aviate-labs/http.mo#v0.1.1"
 moh = "https://github.com/NatLabs/moh#main"
 parser-combinators = "https://github.com/aviate-labs/parser-combinators.mo#v0.1.3"

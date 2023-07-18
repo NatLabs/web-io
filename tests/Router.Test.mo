@@ -1,4 +1,3 @@
-// @testmode wasi
 import Blob "mo:base/Blob";
 import Debug "mo:base/Debug";
 import Principal "mo:base/Principal";

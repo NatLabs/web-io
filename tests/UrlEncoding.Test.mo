@@ -39,17 +39,25 @@ suite(
             func() {
                 let query_map = UrlEncoding.fromText("items=11&level=21&species=");
                 let candid = UrlEncoding.serialize(query_map);
-                let motoko : ?Metadata = from_candid (candid);
+
+                type MetadataWithOptionalSpecies = {
+                    items : Nat;
+                    level : Nat;
+                    species : ?Text;
+                };
+
+                let motoko : ?MetadataWithOptionalSpecies = from_candid (candid);
 
                 assert Iter.toArray(query_map.entries()) == [
                     ("items", "11"),
                     ("level", "21"),
-                    ("species", "pisces"),
+                    ("species", ""),
                 ];
+
                 assert motoko == ?{
                     items = 11;
                     level = 21;
-                    species = "";
+                    species = null;
                 };
             },
         );
@@ -85,7 +93,7 @@ suite(
                 let query_map = UrlEncoding.fromText("name=Dwayne%20Wade&language=French%26English");
 
                 assert Iter.toArray(query_map.keys()) == ["name", "language"];
-
+                
                 assert query_map.get("name") == ?"Dwayne Wade";
                 assert query_map.get("language") == ?"French&English";
             },

@@ -6,7 +6,7 @@ import Text "mo:base/Text";
 import Principal "mo:base/Principal";
 import TrieMap "mo:base/TrieMap";
 
-import serde_json "mo:serde/JSON";
+import { JSON } "mo:serde";
 import { Method } "mo:http/Http";
 
 import Form "Form";
@@ -78,11 +78,14 @@ module {
         };
 
         /// Returns the request body as a JSON blob, that can be decoded to primitive motoko types using the `from_candid()` global function
-        public func json() : ?Blob = Option.map(text(), serde_json.fromText);
+        public func json() : ?Blob {
+            let ?t = text() else return null;
+            ?JSON.fromText(t, null);
+        };
 
         /// Returns the request body as a JSON blob, or traps if the body cannot be decoded as JSON
         public func strict_json() : Blob = switch (text()) {
-            case (?text) { serde_json.fromText(text) };
+            case (?text) { JSON.fromText(text, null) };
             case (null) { Debug.trap("Could not decode body as text") };
         };
 
