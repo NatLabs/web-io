@@ -1,5 +1,11 @@
 # Types
 
+## Type `Candid`
+``` motoko no-repl
+type Candid = Candid.Candid
+```
+
+
 ## Type `HeaderField`
 ``` motoko no-repl
 type HeaderField = (Text, Text)
@@ -14,7 +20,7 @@ type HttpRequest = { url : Text; method : Text; body : Blob; headers : [HeaderFi
 
 ## Type `StreamingToken`
 ``` motoko no-repl
-type StreamingToken = { key : Text; index : Nat }
+type StreamingToken = Candid
 ```
 
 
@@ -38,7 +44,7 @@ type StreamingStrategy = {#Callback : { token : StreamingToken; callback : Strea
 
 ## Type `HttpResponse`
 ``` motoko no-repl
-type HttpResponse = { status_code : Nat16; body : Blob; headers : [HeaderField]; update : ?Bool; streaming_strategy : ?StreamingStrategy }
+type HttpResponse = { status_code : Nat16; body : Blob; headers : [HeaderField]; upgrade : ?Bool; streaming_strategy : ?StreamingStrategy }
 ```
 
 

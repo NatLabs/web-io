@@ -1,8 +1,17 @@
 # ResponseBuilder
 A builder for Http Response objects and records
 
-## `class ResponseBuilder`
+## Class `ResponseBuilder`
 
+``` motoko no-repl
+class ResponseBuilder()
+```
+
+A builder for Http Response objects and records
+
+### Current Limitations
+- Unable to set custom token for the streaming strategy.
+  Users have to use the default `StreamingToken` type which consists of a key and a value.
 
 ### Function `status`
 ``` motoko no-repl
@@ -12,12 +21,12 @@ func status(code : Nat16) : ResponseBuilder
 Sets the status code of the response.
 
 
-### Function `update`
+### Function `upgrade`
 ``` motoko no-repl
-func update(val : Bool) : ResponseBuilder
+func upgrade(val : Bool) : ResponseBuilder
 ```
 
-Sets the `update` flag of the response.
+Sets the `upgrade` flag of the response.
 If true, the response will be resent to the `http_request_update()` function in the canister.
 
 
@@ -93,7 +102,7 @@ Sets the `url` to redirect the client to.
 func build() : Response.Response
 ```
 
-Returns a `Response` object.
+Returns a [`Response`](./response.md#type-response) object.
 
 
 ### Function `build_http`
@@ -101,7 +110,7 @@ Returns a `Response` object.
 func build_http() : T.HttpResponse
 ```
 
-Returns a `HttpResponse` record.
+Returns a [HttpResponse](./types.md#type-httpresponse) record.
 
 
 ### Function `build_canister_http`
@@ -109,8 +118,3 @@ Returns a `HttpResponse` record.
 func build_canister_http() : T.CanisterHttpResponse
 ```
 
-A builder for Http Response objects and records
-
-### Current Limitations
-- Unable to set custom token for the streaming strategy.
-  Users have to use the default `StreamingToken` type which consists of a key and a value.

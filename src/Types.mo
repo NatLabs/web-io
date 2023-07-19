@@ -162,36 +162,4 @@ module {
         http_request : CanisterHttpRequest -> async CanisterHttpResponse;
     };
 
-    public type Request = {
-
-    };
-
-    public type RequestBuilderInterface<Builder> = {
-        add_query : (Text, Text) -> RequestBuilderInterface<Builder>;
-        auth : (Text, Text) -> Builder;
-        bearer_token : Text -> Builder;
-        blob : Blob -> Builder;
-        build : () -> Any;
-        build_canister_http : () -> CanisterHttpRequest;
-        build_http : () -> HttpRequest;
-        caller : Principal -> Builder;
-        cookie : (Text, Text) -> Builder;
-        cycles : Nat -> Builder;
-        file : (Text, File) -> Builder;
-        files : [(Text, File)] -> Builder;
-        follow_redirects : Bool -> Builder;
-        form_field : (Text, Text) -> Builder;
-        form_fields : [(Text, Text)] -> Builder;
-        header : (Text, Text) -> Builder;
-        headers : [HeaderField] -> Builder;
-        html : Text -> Builder;
-        json : (Blob, [Text]) -> Builder;
-        max_bytes : Nat64 -> Builder;
-        max_redirects : Nat -> Builder;
-        method : Text -> Builder;
-        queries : [(Text, Text)] -> Builder;
-        send_request : () -> OutcallResponse;
-        text : Text -> Builder;
-        transform : ?TransformContext -> Builder
-    }
 };

@@ -7,7 +7,11 @@ The format is says the first character should be uppercase and all
 the first characters after a hyphen, '-', should also be uppercase.
 (eg. "Content-Type")
 
-## `class Headers`
+## Class `Headers`
+
+``` motoko no-repl
+class Headers()
+```
 
 
 ### Function `size`

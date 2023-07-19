@@ -1,6 +1,10 @@
 # ArrayMap
 
-## `class ArrayMap<K, V>`
+## Class `ArrayMap<K, V>`
+
+``` motoko no-repl
+class ArrayMap<K, V>(isKeyEq : (K, K) -> Bool, keyHash : K -> Hash.Hash)
+```
 
 
 ### Value `size`

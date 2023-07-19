@@ -90,14 +90,98 @@ func parseLines(boundary : List<Nat8>) : Parser<Nat8, Text>
 ```
 
 
-## Value `Byte`
+## Module `Byte`
+
 ``` motoko no-repl
-let Byte
+module Byte
 ```
 
 
-## Value `Bytes`
+### Function `byte`
 ``` motoko no-repl
-let Bytes
+func byte(b : Nat8) : ByteParser
+```
+
+
+
+### Function `newline`
+``` motoko no-repl
+func newline() : ByteParser
+```
+
+
+
+### Function `not_newline`
+``` motoko no-repl
+func not_newline() : ByteParser
+```
+
+
+
+### Function `char`
+``` motoko no-repl
+func char(c : Char) : ByteParser
+```
+
+
+
+### Function `any`
+``` motoko no-repl
+func any() : ByteParser
+```
+
+
+
+### Function `char_no_quote`
+``` motoko no-repl
+func char_no_quote() : ByteParser
+```
+
+
+## Module `Bytes`
+
+``` motoko no-repl
+module Bytes
+```
+
+
+### Function `bytes`
+``` motoko no-repl
+func bytes(bytes_iter : Iter<Nat8>) : BytesParser
+```
+
+
+
+### Function `text`
+``` motoko no-repl
+func text(t : Text) : BytesParser
+```
+
+
+
+### Function `get_text`
+``` motoko no-repl
+func get_text() : Parser<Nat8, Text>
+```
+
+
+
+### Function `get_text_line`
+``` motoko no-repl
+func get_text_line() : Parser<Nat8, Text>
+```
+
+
+
+### Function `get_line`
+``` motoko no-repl
+func get_line() : Parser<Nat8, List<Nat8>>
+```
+
+
+
+### Function `toText`
+``` motoko no-repl
+func toText(bs : List<Nat8>) : Text
 ```
 

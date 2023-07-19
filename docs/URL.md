@@ -1,7 +1,12 @@
 # URL
 
-## `class URL`
+## Class `URL`
 
+``` motoko no-repl
+class URL(url : Text)
+```
+
+A URL class for parsing and manipulating URLs.
 
 ### Value `protocol`
 ``` motoko no-repl
@@ -43,14 +48,6 @@ func query_text() : Text
 Returns the query parameters as a Text.
 
 
-### Value `path`
-``` motoko no-repl
-let path
-```
-
-Returns the path of the URL. 
-
-
 ### Value `segments`
 ``` motoko no-repl
 let segments
@@ -59,10 +56,17 @@ let segments
 Returns the segments of the path of the URL.
 
 
+### Value `path`
+``` motoko no-repl
+let path
+```
+
+Returns the path of the URL. 
+
+
 ### Function `text`
 ``` motoko no-repl
 func text() : Text
 ```
 
 Returns the URL as a Text excluding the query parameters.
-A URL class for parsing and manipulating URLs.
