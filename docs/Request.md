@@ -1,6 +1,19 @@
 # Request
 
-## `class Request`
+## Type `RequestInitData`
+``` motoko no-repl
+type RequestInitData = { method : Text; url : URL.URL; body : Blob; headers : Headers.Headers; caller : ?Principal.Principal; params : ?TrieMap.TrieMap<Text, Text> }
+```
+
+The Request class represents an HTTP request and provides helpful methods
+Read-only information about an HTTP request
+Use the `RequestBuilder` to create a `Request` object
+
+## Class `Request`
+
+``` motoko no-repl
+class Request(init : RequestInitData)
+```
 
 
 ### Value `url`
@@ -115,7 +128,6 @@ func form() : Form.Form
 ```
 
 Returns the request body as a Form object
-The Request class represents an HTTP request and provides helpful methods
 
 ## Function `fromHttpRequest`
 ``` motoko no-repl
@@ -123,33 +135,3 @@ func fromHttpRequest(httpReq : T.HttpRequest) : Request
 ```
 
 Create a `Request` object from a `HttpRequest` record
-
-## Function `Get`
-``` motoko no-repl
-func Get(url : Text) : Request
-```
-
-
-## Function `Delete`
-``` motoko no-repl
-func Delete(url : Text) : Request
-```
-
-
-## Function `Post`
-``` motoko no-repl
-func Post(url : Text, body : Blob) : Request
-```
-
-
-## Function `Put`
-``` motoko no-repl
-func Put(url : Text, body : Blob) : Request
-```
-
-
-## Function `Patch`
-``` motoko no-repl
-func Patch(url : Text, body : Blob) : Request
-```
-

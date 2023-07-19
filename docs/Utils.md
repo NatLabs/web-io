@@ -1,13 +1,27 @@
 # Utils
 
-## Value `BufferModule`
+## Module `BufferModule`
+
 ``` motoko no-repl
-let BufferModule
+module BufferModule
 ```
 
 
-## Value `ListModule`
+### Function `iterSlice`
 ``` motoko no-repl
-let ListModule
+func iterSlice<A>(buffer : Buffer.Buffer<A>, start : Nat, end : Nat) : Iter.Iter<A>
+```
+
+
+## Module `ListModule`
+
+``` motoko no-repl
+module ListModule
+```
+
+
+### Function `isPrefixOf`
+``` motoko no-repl
+func isPrefixOf<A>(prefix : List<A>, list : List<A>, eq : (A, A) -> Bool) : Bool
 ```
 

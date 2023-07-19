@@ -9,10 +9,11 @@ encoding = "https://github.com/aviate-labs/encoding.mo#v0.4.1"
 fuzz = "0.1.0"
 
 [package]
-name = "web-api"
-version = "0.1.0"
-description = ""
-repository = ""
+name = "web-io"
+version = "0.0.1"
+description = "A set of modules for creating http requests and handling responses"
+repository = "https://github.com/NatLabs/web-io"
+keywords = ["http", "web"]
 
 [dev-dependencies]
 test = "1.0.1"

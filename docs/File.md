@@ -8,8 +8,15 @@ type FileData = { filename : Text; content_type : Text; mtime : ?Time.Time }
 
 Required arguements for initializing a `File`
 
-## `class File`
+## Class `File`
 
+``` motoko no-repl
+class File(_filename : Text, _content_type : Text, _mtime : ?Time.Time)
+```
+
+The File class holds the data and metadata of a single file. 
+The File class provides the minimum interface required for a file. 
+Additional functions are added to the module for manipulating chunked data.
 
 ### Value `filename`
 ``` motoko no-repl
@@ -73,9 +80,6 @@ func slice(start : Nat, end : Nat) : Blob
 
 Returns a slice of the File's data
 specified by the `start` and `end` indices
-The File class holds the data and metadata of a single file. 
-The File class provides the minimum interface required for a file. 
-Additional functions are added to the module for manipulating chunked data.
 
 ## Function `fromBytes`
 ``` motoko no-repl

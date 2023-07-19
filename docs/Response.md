@@ -1,12 +1,24 @@
 # Response
+The `Response` class is a read-only representation of a http response with utility methods for accessing the response data.
+Response objects should be instantiated using the `ResponseBuilder` or the `Response.fromCanisterHttp` and `Response.fromHttpResponse` methods.
 
 ## Type `ResponseOptions`
 ``` motoko no-repl
-type ResponseOptions = { update : Bool; streaming_strategy : ?T.StreamingStrategy; headers : ?Headers.Headers }
+type ResponseOptions = { upgrade : Bool; streaming_strategy : ?T.StreamingStrategy; headers : ?Headers.Headers }
 ```
 
 
-## `class Response`
+## Type `ResponseInitData`
+``` motoko no-repl
+type ResponseInitData = { status_code : Nat16; body : Blob; upgrade : Bool; streaming_strategy : ?T.StreamingStrategy; headers : ?Headers.Headers }
+```
+
+
+## Class `Response`
+
+``` motoko no-repl
+class Response(init : ResponseInitData)
+```
 
 
 ### Value `status_code`
@@ -16,9 +28,9 @@ let status_code
 
 
 
-### Value `update`
+### Value `upgrade`
 ``` motoko no-repl
-let update
+let upgrade
 ```
 
 
