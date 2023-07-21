@@ -3,7 +3,7 @@ import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
 import { test; suite } "mo:test";
 
-import Headers "../src/Headers";
+import Headers "../../src/Headers";
 
 suite(
     "Headers Test",

@@ -30,7 +30,7 @@ module {
 
     type RequestBuilderChainingInterface<A> = RequestBuilder.RequestBuilderChainingInterface<A>;
 
-    type OutcallInterface<OutcallClass> = RequestBuilderChainingInterface<OutcallClass> and {
+    public type OutcallInterface<OutcallClass> = RequestBuilderChainingInterface<OutcallClass> and {
         follow_redirects : Bool -> OutcallClass;
         max_redirects : Nat -> OutcallClass;
         send_request : () -> async* T.OutcallResponse;

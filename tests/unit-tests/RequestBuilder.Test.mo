@@ -1,5 +1,4 @@
-// cant use 'wasi' testmode because the RequestBuilder module has async functions
-// Using the interpreter instead
+// @testmode wasi
 
 import Debug "mo:base/Debug";
 import Iter "mo:base/Iter";
@@ -8,7 +7,8 @@ import Text "mo:base/Text";
 
 import { suite; test } "mo:test";
 
-import RequestBuilder "../src/RequestBuilder";
+import RequestBuilder "../../src/RequestBuilder";
+import Response "../../src/Response";
 
 suite(
     "Testing RequestBuilder",
@@ -32,7 +32,7 @@ suite(
             assert res.query_map.get("age") == ?"42";
           
         });
-
+        
         test(
             "Post request",
             func(){
@@ -52,6 +52,39 @@ suite(
 
                 assert res.query_map.get("name") == ?"John";
                 assert res.query_map.get("age") == ?"42";
+            }
+        );
+
+        test(
+            "Serialize to JSON", 
+            func() {
+
+                type Details = {
+                    name : Text;
+                    age : Nat;
+                    tags : [Text];
+                    email : ?Text;
+                };
+
+                let DetailsKeys = ["name", "age", "tags", "email"];
+
+                let details_example = {
+                    name = "John";
+                    age = 42;
+                    tags = ["foo", "bar"];
+                    email = null;
+                };
+
+                let res = RequestBuilder
+                    .RequestBuilder("example.com/users/random_user")
+                    .method("POST")
+                    .json(to_candid(details_example), DetailsKeys)
+                    .build();
+
+                let response_body : ?Details = from_candid(res.strict_json());
+
+                assert response_body == ?details_example;
+
             }
         )
     },

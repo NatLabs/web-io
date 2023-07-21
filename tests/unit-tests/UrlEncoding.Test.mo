@@ -7,7 +7,7 @@ import Itertools "mo:itertools/Iter";
 
 import { suite; test } "mo:test";
 
-import UrlEncoding "../src/UrlEncoding";
+import UrlEncoding "../../src/UrlEncoding";
 
 
 type Metadata = {

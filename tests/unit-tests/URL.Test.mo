@@ -6,7 +6,7 @@ import Text "mo:base/Text";
 
 import { suite; test } "mo:test";
 
-import URL "../src/URL";
+import URL "../../src/URL";
 
 suite(
     "URL",

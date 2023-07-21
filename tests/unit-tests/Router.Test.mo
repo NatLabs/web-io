@@ -7,7 +7,7 @@ import Iter "mo:base/Iter";
 import { suite; test } "mo:test";
 import Mo "mo:moh";
 
-import {Router; Headers} "../src";
+import {Router; Headers} "../../src";
 
 let user = Principal.fromText("aaaaa-aa");
 
